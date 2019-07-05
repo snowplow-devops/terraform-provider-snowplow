@@ -8,7 +8,7 @@ Terraform provider for emitting Snowplow events.
 
 ## Quick start
 
-Assuming git, **[Vagrant][vagrant-install]** and **[VirtualBox][virtualbox-install]** installed:
+Assuming git, **[Vagrant][vagrant-url]** and **[VirtualBox][virtualbox-url]** installed:
 
 ```bash
  host> git clone https://github.com/snowplow-devops/terraform-provider-snowplow
