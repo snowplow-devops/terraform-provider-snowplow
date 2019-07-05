@@ -1,0 +1,23 @@
+language: go
+go:
+  - "1.10.x"
+  - "1.11.x"
+  - "1.12.5"
+
+before_install:
+  - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+
+script:
+  - make all
+  - make goveralls
+
+before_deploy:
+  - pip install --user release-manager==0.1.0
+
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: make release
+  on:
+    condition: '"${TRAVIS_GO_VERSION}" == "1.12.5"'
+    tags: true

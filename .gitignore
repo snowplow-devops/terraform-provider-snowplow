@@ -1,0 +1,16 @@
+# Golang
+vendor/
+
+# IntelliJ
+.idea
+
+# macOS
+.DS_Store
+
+# Vagrant
+*.log
+.vagrant
+
+# Project
+build/
+.release.yml.tmp
