@@ -19,7 +19,12 @@ import (
 )
 
 type Context struct {
-	tracker *gt.Tracker
+	CollectorUri       string
+	TrackerAppId       string
+	TrackerNamespace   string
+	TrackerPlatform    string
+	EmitterRequestType string
+	EmitterProtocol    string
 }
 
 func Provider() *schema.Provider {
@@ -75,10 +80,36 @@ func Provider() *schema.Provider {
 }
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
+	ctx := Context{
+		CollectorUri:       d.Get("collector_uri").(string),
+		TrackerAppId:       d.Get("tracker_app_id").(string),
+		TrackerNamespace:   d.Get("tracker_namespace").(string),
+		TrackerPlatform:    d.Get("tracker_platform").(string),
+		EmitterRequestType: d.Get("emitter_request_type").(string),
+		EmitterProtocol:    d.Get("emitter_protocol").(string),
+	}
+
+	return &ctx, nil
+}
+
+func InitTracker(ctx Context, trackerChan chan int) *gt.Tracker {
+	callback := func(s []gt.CallbackResult, f []gt.CallbackResult) {
+		status := 0
+
+		if len(s) == 1 {
+			status = s[0].Status
+		} else if len(f) == 1 {
+			status = f[0].Status
+		}
+
+		trackerChan <- status
+	}
+
 	emitter := gt.InitEmitter(
-		gt.RequireCollectorUri(d.Get("collector_uri").(string)),
-		gt.OptionRequestType(d.Get("emitter_request_type").(string)),
-		gt.OptionProtocol(d.Get("emitter_protocol").(string)),
+		gt.RequireCollectorUri(ctx.CollectorUri),
+		gt.OptionRequestType(ctx.EmitterRequestType),
+		gt.OptionProtocol(ctx.EmitterProtocol),
+		gt.OptionCallback(callback),
 		gt.OptionStorage(gt.InitStorageMemory()),
 	)
 
@@ -87,15 +118,25 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	tracker := gt.InitTracker(
 		gt.RequireEmitter(emitter),
 		gt.OptionSubject(subject),
-		gt.OptionNamespace(d.Get("tracker_namespace").(string)),
-		gt.OptionAppId(d.Get("tracker_app_id").(string)),
-		gt.OptionPlatform(d.Get("tracker_platform").(string)),
+		gt.OptionNamespace(ctx.TrackerNamespace),
+		gt.OptionAppId(ctx.TrackerAppId),
+		gt.OptionPlatform(ctx.TrackerPlatform),
 		gt.OptionBase64Encode(true),
 	)
 
-	ctx := Context{
-		tracker: tracker,
+	return tracker
+}
+
+func ParseStatusCode(statusCode int) bool {
+	var success bool
+	result := statusCode / 100
+
+	switch result {
+	case 2, 3:
+		success = true
+	default:
+		success = false
 	}
 
-	return &ctx, nil
+	return success
 }
