@@ -9,7 +9,7 @@ before_install:
 
 script:
   - make all
-  - make goveralls
+  - make test
 
 before_deploy:
   - pip install --user release-manager==0.4.1

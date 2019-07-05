@@ -1,4 +1,4 @@
-.PHONY: all format lint test goveralls release release-dry dep clean
+.PHONY: all format lint test release release-dry dep clean
 
 # -----------------------------------------------------------------------------
 #  CONSTANTS
@@ -54,10 +54,6 @@ test: dep
 	go get -u golang.org/x/tools/cmd/cover/...
 	go test ./$(src_dir) -tags test -v -covermode=count -coverprofile=$(coverage_out)
 	go tool cover -html=$(coverage_out) -o $(coverage_html)
-
-goveralls: test
-	go get -u github.com/mattn/goveralls
-	goveralls -coverprofile=$(coverage_out) -service=travis-ci
 
 # -----------------------------------------------------------------------------
 #  RELEASE
