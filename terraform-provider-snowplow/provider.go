@@ -32,44 +32,45 @@ func Provider() *schema.Provider {
 			},
 			"tracker_app_id": {
 				Type:        schema.TypeString,
+				Optional:    true,
 				Required:    false,
 				Description: "Optional application ID",
 				Default:     "",
 			},
 			"tracker_namespace": {
 				Type:        schema.TypeString,
+				Optional:    true,
 				Required:    false,
 				Description: "Optional namespace",
 				Default:     "",
 			},
 			"tracker_platform": {
 				Type:        schema.TypeString,
+				Optional:    true,
 				Required:    false,
 				Description: "Optional platform",
 				Default:     "srv",
 			},
-			"base64_encode": {
-				Type:        schema.TypeBool,
-				Required:    false,
-				Description: "Whether to base64 encode custom contexts and self-describing JSONs",
-				Default:     true,
-			},
 			"emitter_request_type": {
 				Type:        schema.TypeString,
+				Optional:    true,
 				Required:    false,
 				Description: "Whether to use GET or POST requests to emit events",
 				Default:     "POST",
 			},
 			"emitter_protocol": {
 				Type:        schema.TypeString,
+				Optional:    true,
 				Required:    false,
 				Description: "Whether to use HTTP or HTTPS to send events",
 				Default:     "HTTPS",
 			},
 		},
-		ResourcesMap:  map[string]*schema.Resource{},
+		ResourcesMap: map[string]*schema.Resource{
+			"snowplow_track_page_view": resourceTrackPageView(),
+		},
 		DataSourcesMap: map[string]*schema.Resource{},
-		ConfigureFunc: providerConfigure,
+		ConfigureFunc:  providerConfigure,
 	}
 }
 
@@ -89,7 +90,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		gt.OptionNamespace(d.Get("tracker_namespace").(string)),
 		gt.OptionAppId(d.Get("tracker_app_id").(string)),
 		gt.OptionPlatform(d.Get("tracker_platform").(string)),
-		gt.OptionBase64Encode(d.Get("base64_encode").(bool)),
+		gt.OptionBase64Encode(true),
 	)
 
 	ctx := Context{
