@@ -72,7 +72,7 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"snowplow_track_page_view": resourceTrackPageView(),
+			"snowplow_track_self_describing_event": resourceTrackSelfDescribingEvent(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{},
 		ConfigureFunc:  providerConfigure,
@@ -125,18 +125,4 @@ func InitTracker(ctx Context, trackerChan chan int) *gt.Tracker {
 	)
 
 	return tracker
-}
-
-func ParseStatusCode(statusCode int) bool {
-	var success bool
-	result := statusCode / 100
-
-	switch result {
-	case 2, 3:
-		success = true
-	default:
-		success = false
-	}
-
-	return success
 }

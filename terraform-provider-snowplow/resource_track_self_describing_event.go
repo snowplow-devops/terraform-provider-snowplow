@@ -16,54 +16,75 @@ package main
 import (
 	"github.com/hashicorp/terraform/helper/schema"
 	gt "gopkg.in/snowplow/snowplow-golang-tracker.v2/tracker"
-	"fmt"
 )
 
-func resourceTrackPageView() *schema.Resource {
+func resourceTrackSelfDescribingEvent() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceTrackPageViewCreate,
-		Read:   resourceTrackPageViewRead,
-		Delete: resourceTrackPageViewDelete,
+		Create: resourceTrackSelfDescribingEventCreate,
+		Read:   resourceTrackSelfDescribingEventRead,
+		Delete: resourceTrackSelfDescribingEventDelete,
 
 		Schema: map[string]*schema.Schema{
-			"pv_name": {
+			"iglu_uri": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Required: true,
 			},
-			"pv_id": {
+			"payload": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Required: true,
+			},
+			"contexts": {
+				Type:     schema.TypeList,
+				ForceNew: true,
+				Required: true,
+				Elem:     &schema.Schema{Type: schema.TypeMap},
 			},
 		},
 	}
 }
 
-func resourceTrackPageViewCreate(d *schema.ResourceData, m interface{}) error {
+func resourceTrackSelfDescribingEventCreate(d *schema.ResourceData, m interface{}) error {
 	ctx := m.(*Context)
 
 	trackerChan := make(chan int, 1)
 	tracker := InitTracker(*ctx, trackerChan)
 
-	tracker.TrackScreenView(gt.ScreenViewEvent{
-		Name: gt.NewString(d.Get("pv_name").(string)),
-		Id:   gt.NewString(d.Get("pv_id").(string)),
+	contexts, err := contextsFromList(d.Get("contexts").([]interface{}))
+	if err != nil {
+		return err
+	}
+
+	payloadData, err := stringToMap(d.Get("payload").(string))
+	if err != nil {
+		return err
+	}
+
+	sdj := gt.InitSelfDescribingJson(
+		d.Get("iglu_uri").(string),
+		payloadData,
+	)
+
+	tracker.TrackSelfDescribingEvent(gt.SelfDescribingEvent{
+		Event:    sdj,
+		Contexts: contexts,
 	})
 
 	statusCode := <-trackerChan
 
-	if !ParseStatusCode(statusCode) {
-		return fmt.Errorf("Got %d status code when sending event - need 2xx or 3xx", statusCode)
+	err = parseStatusCode(statusCode)
+	if err != nil {
+		return err
 	}
 
-	return resourceTrackPageViewRead(d, m)
+	return resourceTrackSelfDescribingEventRead(d, m)
 }
 
-func resourceTrackPageViewRead(d *schema.ResourceData, m interface{}) error {
+func resourceTrackSelfDescribingEventRead(d *schema.ResourceData, m interface{}) error {
 	return nil
 }
 
-func resourceTrackPageViewDelete(d *schema.ResourceData, m interface{}) error {
+func resourceTrackSelfDescribingEventDelete(d *schema.ResourceData, m interface{}) error {
 	return nil
 }
