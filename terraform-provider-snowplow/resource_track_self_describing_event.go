@@ -61,8 +61,10 @@ func resourceTrackSelfDescribingEventCreate(d *schema.ResourceData, m interface{
 		return err
 	}
 
+	iglu_uri := d.Get("iglu_uri").(string)
+
 	sdj := gt.InitSelfDescribingJson(
-		d.Get("iglu_uri").(string),
+		iglu_uri,
 		payloadData,
 	)
 
@@ -78,6 +80,8 @@ func resourceTrackSelfDescribingEventCreate(d *schema.ResourceData, m interface{
 		return err
 	}
 
+	d.SetId(iglu_uri)
+
 	return resourceTrackSelfDescribingEventRead(d, m)
 }
 
@@ -86,5 +90,6 @@ func resourceTrackSelfDescribingEventRead(d *schema.ResourceData, m interface{})
 }
 
 func resourceTrackSelfDescribingEventDelete(d *schema.ResourceData, m interface{}) error {
+	d.SetId("")
 	return nil
 }
