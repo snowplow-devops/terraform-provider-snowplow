@@ -23,8 +23,8 @@ func TestInitTracker(t *testing.T) {
 
 	// Setup Tracker
 	ctx := Context{
-		CollectorUri:       "com.acme",
-		TrackerAppId:       "",
+		CollectorURI:       "com.acme",
+		TrackerAppID:       "",
 		TrackerNamespace:   "",
 		TrackerPlatform:    "srv",
 		EmitterRequestType: "GET",

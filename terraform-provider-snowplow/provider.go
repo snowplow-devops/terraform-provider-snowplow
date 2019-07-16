@@ -18,15 +18,17 @@ import (
 	gt "gopkg.in/snowplow/snowplow-golang-tracker.v2/tracker"
 )
 
+// Context the struct made from the provider input options
 type Context struct {
-	CollectorUri       string
-	TrackerAppId       string
+	CollectorURI       string
+	TrackerAppID       string
 	TrackerNamespace   string
 	TrackerPlatform    string
 	EmitterRequestType string
 	EmitterProtocol    string
 }
 
+// Provider creates a new provider struct ready for use by Terraform
 func Provider() *schema.Provider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
@@ -81,8 +83,8 @@ func Provider() *schema.Provider {
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	ctx := Context{
-		CollectorUri:       d.Get("collector_uri").(string),
-		TrackerAppId:       d.Get("tracker_app_id").(string),
+		CollectorURI:       d.Get("collector_uri").(string),
+		TrackerAppID:       d.Get("tracker_app_id").(string),
 		TrackerNamespace:   d.Get("tracker_namespace").(string),
 		TrackerPlatform:    d.Get("tracker_platform").(string),
 		EmitterRequestType: d.Get("emitter_request_type").(string),
@@ -92,6 +94,8 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	return &ctx, nil
 }
 
+// InitTracker takes a context and a channel of size 1 and returns
+// a new Snowplow Tracker ready to create a resource
 func InitTracker(ctx Context, trackerChan chan int) *gt.Tracker {
 	callback := func(s []gt.CallbackResult, f []gt.CallbackResult) {
 		status := 0
@@ -106,7 +110,7 @@ func InitTracker(ctx Context, trackerChan chan int) *gt.Tracker {
 	}
 
 	emitter := gt.InitEmitter(
-		gt.RequireCollectorUri(ctx.CollectorUri),
+		gt.RequireCollectorUri(ctx.CollectorURI),
 		gt.OptionRequestType(ctx.EmitterRequestType),
 		gt.OptionProtocol(ctx.EmitterProtocol),
 		gt.OptionCallback(callback),
@@ -119,7 +123,7 @@ func InitTracker(ctx Context, trackerChan chan int) *gt.Tracker {
 		gt.RequireEmitter(emitter),
 		gt.OptionSubject(subject),
 		gt.OptionNamespace(ctx.TrackerNamespace),
-		gt.OptionAppId(ctx.TrackerAppId),
+		gt.OptionAppId(ctx.TrackerAppID),
 		gt.OptionPlatform(ctx.TrackerPlatform),
 		gt.OptionBase64Encode(true),
 	)
