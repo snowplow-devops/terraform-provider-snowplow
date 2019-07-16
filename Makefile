@@ -4,6 +4,8 @@
 #  CONSTANTS
 # -----------------------------------------------------------------------------
 
+version = `cat VERSION`
+
 src_dir := terraform-provider-snowplow
 
 build_dir = build
@@ -18,7 +20,7 @@ linux_dir     = $(output_dir)/linux
 darwin_dir    = $(output_dir)/darwin
 windows_dir   = $(output_dir)/windows
 
-bin_name      = terraform-provider-snowplow
+bin_name      = terraform-provider-snowplow_v$(version)
 bin_linux     = $(linux_dir)/$(bin_name)
 bin_darwin    = $(darwin_dir)/$(bin_name)
 bin_windows   = $(windows_dir)/$(bin_name)
