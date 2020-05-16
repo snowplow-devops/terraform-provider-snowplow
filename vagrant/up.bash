@@ -42,11 +42,6 @@ while read pb; do
 done <${vagrant_dir}/up.playbooks
 source /etc/profile
 
-echo "====================="
-echo "INSTALLING GOLANG DEP"
-echo "---------------------"
-curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-
 guidance=${vagrant_dir}/up.guidance
 
 if [ -f ${guidance} ]; then

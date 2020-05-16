@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2019 Snowplow Analytics Ltd. All rights reserved.
+// Copyright (c) 2019-2020 Snowplow Analytics Ltd. All rights reserved.
 //
 // This program is licensed to you under the Apache License Version 2.0,
 // and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -16,9 +16,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	gt "gopkg.in/snowplow/snowplow-golang-tracker.v2/tracker"
-	"strings"
+	gt "github.com/snowplow/snowplow-golang-tracker/v2/tracker"
 	"github.com/twinj/uuid"
+	"strings"
 )
 
 // getUUID generates a Version 4 UUID string.
