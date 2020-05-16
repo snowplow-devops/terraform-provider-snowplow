@@ -39,11 +39,11 @@ guest> make format
 
 First download the pre-compiled binary for your platform from our Bintray at the following links or generate the binaries locally using the provided `make` command:
 
-* [Darwin (macOS)](https://bintray.com/snowplow/snowplow-generic/download_file?file_path=terraform_provider_snowplow_0.1.1_darwin_amd64.zip)
-* [Linux](https://bintray.com/snowplow/snowplow-generic/download_file?file_path=terraform_provider_snowplow_0.1.1_linux_amd64.zip)
-* [Windows](https://bintray.com/snowplow/snowplow-generic/download_file?file_path=terraform_provider_snowplow_0.1.1_windows_amd64.zip)
+* [Darwin (macOS)](https://bintray.com/snowplow/snowplow-generic/download_file?file_path=terraform_provider_snowplow_0.2.0_darwin_amd64.zip)
+* [Linux](https://bintray.com/snowplow/snowplow-generic/download_file?file_path=terraform_provider_snowplow_0.2.0_linux_amd64.zip)
+* [Windows](https://bintray.com/snowplow/snowplow-generic/download_file?file_path=terraform_provider_snowplow_0.2.0_windows_amd64.zip)
 
-Once downloaded "unzip" to extract the binary which should be called `terraform-provider-snowplow_v0.1.1`.
+Once downloaded "unzip" to extract the binary which should be called `terraform-provider-snowplow_v0.2.0`.
 
 From here you will need to move the binary into your Terraform plugins directory - depending on your platform / installation this might change but generally speaking they are located at:
 
@@ -155,7 +155,7 @@ limitations under the License.
 [travis-image]: https://travis-ci.com/snowplow-devops/terraform-provider-snowplow.png?branch=master
 [travis]: https://travis-ci.com/snowplow-devops/terraform-provider-snowplow
 
-[release-image]: http://img.shields.io/badge/release-0.1.1-6ad7e5.svg?style=flat
+[release-image]: http://img.shields.io/badge/release-0.2.0-6ad7e5.svg?style=flat
 [releases]: https://github.com/snowplow-devops/terraform-provider-snowplow/releases
 
 [license-image]: http://img.shields.io/badge/license-Apache--2-blue.svg?style=flat
