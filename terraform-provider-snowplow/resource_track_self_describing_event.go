@@ -15,7 +15,7 @@ package main
 
 import (
 	"github.com/hashicorp/terraform/helper/schema"
-	gt "gopkg.in/snowplow/snowplow-golang-tracker.v2/tracker"
+	gt "github.com/snowplow/snowplow-golang-tracker/v2/tracker"
 )
 
 func resourceTrackSelfDescribingEvent() *schema.Resource {

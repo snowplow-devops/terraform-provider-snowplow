@@ -16,9 +16,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	gt "gopkg.in/snowplow/snowplow-golang-tracker.v2/tracker"
-	"strings"
+	gt "github.com/snowplow/snowplow-golang-tracker/v2/tracker"
 	"github.com/twinj/uuid"
+	"strings"
 )
 
 // getUUID generates a Version 4 UUID string.
