@@ -39,11 +39,11 @@ guest> make format
 
 First download the pre-compiled binary for your platform from our Bintray at the following links or generate the binaries locally using the provided `make` command:
 
-* [Darwin (macOS)](https://bintray.com/snowplow/snowplow-generic/download_file?file_path=terraform_provider_snowplow_0.2.0_darwin_amd64.zip)
-* [Linux](https://bintray.com/snowplow/snowplow-generic/download_file?file_path=terraform_provider_snowplow_0.2.0_linux_amd64.zip)
-* [Windows](https://bintray.com/snowplow/snowplow-generic/download_file?file_path=terraform_provider_snowplow_0.2.0_windows_amd64.zip)
+* [Darwin (macOS)](https://bintray.com/snowplow/snowplow-generic/download_file?file_path=terraform_provider_snowplow_0.3.0_darwin_amd64.zip)
+* [Linux](https://bintray.com/snowplow/snowplow-generic/download_file?file_path=terraform_provider_snowplow_0.3.0_linux_amd64.zip)
+* [Windows](https://bintray.com/snowplow/snowplow-generic/download_file?file_path=terraform_provider_snowplow_0.3.0_windows_amd64.zip)
 
-Once downloaded "unzip" to extract the binary which should be called `terraform-provider-snowplow_v0.2.0`.
+Once downloaded "unzip" to extract the binary which should be called `terraform-provider-snowplow_v0.3.0`.
 
 From here you will need to move the binary into your Terraform plugins directory - depending on your platform / installation this might change but generally speaking they are located at:
 
@@ -90,50 +90,45 @@ locals {
 }
 
 resource "snowplow_track_self_describing_event" "module_action" {
-  create_event = {
-    iglu_uri = "iglu:com.acme/lifecycle/jsonschema/1-0-0",
-    payload  = "{\"actionType\":\"create\"}"
+  create_event {
+    iglu_uri = "iglu:com.acme/lifecycle/jsonschema/1-0-0"
+
+    payload  = {
+      actionType = "create"
+    }
   }
 
-  update_event = {
-    iglu_uri = "iglu:com.acme/lifecycle/jsonschema/1-0-0",
-    payload  = "{\"actionType\":\"update\"}"
+  update_event {
+    iglu_uri = "iglu:com.acme/lifecycle/jsonschema/1-0-0"
+
+    payload = {
+      actionType = "update"
+    }
   }
 
-  delete_event = {
-    iglu_uri = "iglu:com.acme/lifecycle/jsonschema/1-0-0",
-    payload  = "{\"actionType\":\"delete\"}"
+  delete_event {
+    iglu_uri = "iglu:com.acme/lifecycle/jsonschema/1-0-0"
+
+    payload = {
+      actionType = "delete"
+    }
   }
 
-  contexts = [
-    {
-      iglu_uri = "iglu:com.acme/module_context/jsonschema/1-0-0",
-      payload  = "${jsonencode(local.tf_module_context)}",
-    },
-  ]
+  // Add multiple context blocks
+
+  context {
+    iglu_uri = "iglu:com.acme/module_context/jsonschema/1-0-0"
+
+    payload = {
+      foo = "bar"
+    }
+  }
 }
 ```
-
-To get around nested dictionary limitations in Terraform `0.11.x` we are using stringified JSON as inputs for the payloads.  In the example above we are leveraging the `jsonencode` builtin function to handle converting a Terraform dictionary into a JSON but you can also hand-craft encoded JSON strings if you prefer.
 
 The above function lets you define a single event which is coupled with as many contexts as you would like to attach - when you run `terraform apply` it will send an event to your defined collector and on a `200 OK` response code from the collector log this as a successful resource creation.
 
 Its important to define a base event for _each_ part of the resource lifecycle so that you can differentiate your events later and to be able to reason about where in the lifecycle a resource might be.
-
-### How to stop Terraform turning primitives into strings
-
-We are using a lot of stringified JSON as input above - the `jsonencode` function unfortunately turns a lot of our primitives ("floats", "ints" and "booleans") into strings through this conversion.  One way to get around this is to use regex to "fix" the payload after conversion:
-
-```hcl
-# Convert int, floats
-payload_1 = "${replace(jsonencode(var.payload), "/\"([0-9]+\\.?[0-9]*)\"/", "$1")}"
-
-# Convert "true" > true
-payload_2 = "${replace(local.payload_1, "/\"(true)\"/", "$1")}"
-
-# Convert "false" > false
-payload_3 = "${replace(local.payload_2, "/\"(false)\"/", "$1")}"
-```
  
 ### Publishing
 
@@ -155,7 +150,7 @@ limitations under the License.
 [travis-image]: https://travis-ci.com/snowplow-devops/terraform-provider-snowplow.png?branch=master
 [travis]: https://travis-ci.com/snowplow-devops/terraform-provider-snowplow
 
-[release-image]: http://img.shields.io/badge/release-0.2.0-6ad7e5.svg?style=flat
+[release-image]: http://img.shields.io/badge/release-0.3.0-6ad7e5.svg?style=flat
 [releases]: https://github.com/snowplow-devops/terraform-provider-snowplow/releases
 
 [license-image]: http://img.shields.io/badge/license-Apache--2-blue.svg?style=flat
