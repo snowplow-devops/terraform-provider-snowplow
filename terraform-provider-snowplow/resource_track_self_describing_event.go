@@ -19,6 +19,19 @@ import (
 )
 
 func resourceTrackSelfDescribingEvent() *schema.Resource {
+	eventSchema := &schema.Resource{
+		Schema: map[string]*schema.Schema{
+			"iglu_uri": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"payload": {
+				Type:     schema.TypeMap,
+				Optional: true,
+			},
+		},
+	}
+
 	return &schema.Resource{
 		Create: resourceTrackSelfDescribingEventCreate,
 		Read:   resourceTrackSelfDescribingEventRead,
@@ -27,38 +40,44 @@ func resourceTrackSelfDescribingEvent() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"create_event": {
-				Type:     schema.TypeMap,
-				Required: true,
-			},
-			"update_event": {
-				Type:     schema.TypeMap,
-				Required: true,
-			},
-			"delete_event": {
-				Type:     schema.TypeMap,
-				Required: true,
-			},
-			"contexts": {
 				Type:     schema.TypeList,
 				Required: true,
-				Elem:     &schema.Schema{Type: schema.TypeMap},
+				MaxItems: 1,
+				Elem:     eventSchema,
+			},
+			"update_event": {
+				Type:     schema.TypeList,
+				Required: true,
+				MaxItems: 1,
+				Elem:     eventSchema,
+			},
+			"delete_event": {
+				Type:     schema.TypeList,
+				Required: true,
+				MaxItems: 1,
+				Elem:     eventSchema,
+			},
+			"context": {
+				Type:     schema.TypeList,
+				Required: true,
+				Elem:     eventSchema,
 			},
 		},
 	}
 }
 
-func trackSelfDescribingEvent(d *schema.ResourceData, m interface{}, lifecycleEventMap map[string]interface{}) error {
+func trackSelfDescribingEvent(d *schema.ResourceData, m interface{}, lifecycleEventMap interface{}) error {
 	ctx := m.(*Context)
 
 	trackerChan := make(chan int, 1)
 	tracker := InitTracker(*ctx, trackerChan)
 
-	contexts, err := contextsFromList(d.Get("contexts").([]interface{}))
+	contexts, err := contextsFromList(d.Get("context").([]interface{}))
 	if err != nil {
 		return err
 	}
 
-	lifecycleEvent, err := selfDescribingJSONFromMap(lifecycleEventMap)
+	lifecycleEvent, err := selfDescribingJSONFromMap(lifecycleEventMap.(map[string]interface{}))
 	if err != nil {
 		return err
 	}
@@ -74,7 +93,7 @@ func trackSelfDescribingEvent(d *schema.ResourceData, m interface{}, lifecycleEv
 }
 
 func resourceTrackSelfDescribingEventCreate(d *schema.ResourceData, m interface{}) error {
-	err := trackSelfDescribingEvent(d, m, d.Get("create_event").(map[string]interface{}))
+	err := trackSelfDescribingEvent(d, m, d.Get("create_event").([]interface{})[0])
 	if err != nil {
 		return err
 	}
@@ -89,7 +108,7 @@ func resourceTrackSelfDescribingEventRead(d *schema.ResourceData, m interface{})
 }
 
 func resourceTrackSelfDescribingEventUpdate(d *schema.ResourceData, m interface{}) error {
-	err := trackSelfDescribingEvent(d, m, d.Get("update_event").(map[string]interface{}))
+	err := trackSelfDescribingEvent(d, m, d.Get("update_event").([]interface{})[0])
 	if err != nil {
 		return err
 	}
@@ -98,7 +117,7 @@ func resourceTrackSelfDescribingEventUpdate(d *schema.ResourceData, m interface{
 }
 
 func resourceTrackSelfDescribingEventDelete(d *schema.ResourceData, m interface{}) error {
-	err := trackSelfDescribingEvent(d, m, d.Get("delete_event").(map[string]interface{}))
+	err := trackSelfDescribingEvent(d, m, d.Get("delete_event").([]interface{})[0])
 	if err != nil {
 		return err
 	}

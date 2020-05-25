@@ -14,11 +14,10 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	gt "github.com/snowplow/snowplow-golang-tracker/v2/tracker"
 	"github.com/twinj/uuid"
-	"strings"
+	"strconv"
 )
 
 // getUUID generates a Version 4 UUID string.
@@ -40,18 +39,6 @@ func parseStatusCode(statusCode int) error {
 	}
 
 	return err
-}
-
-// stringToMap attempts to convert a string (assumed JSON) to a map.
-func stringToMap(str string) (map[string]interface{}, error) {
-	var jsonDataMap map[string]interface{}
-	d := json.NewDecoder(strings.NewReader(str))
-	d.UseNumber()
-	err := d.Decode(&jsonDataMap)
-	if err != nil {
-		return nil, err
-	}
-	return jsonDataMap, nil
 }
 
 // contextsFromList converts a list of interfaces to context SDJs.
@@ -78,21 +65,43 @@ func contextsFromList(vs []interface{}) ([]gt.SelfDescribingJson, error) {
 // selfDescribingJsonFromMap converts a map into a context SDJ.
 func selfDescribingJSONFromMap(attr map[string]interface{}) (*gt.SelfDescribingJson, error) {
 	if _, ok := attr["iglu_uri"]; !ok {
-		return nil, fmt.Errorf("Invalid context attributes: 'iglu_uri' key missing")
+		return nil, fmt.Errorf("Invalid attributes: 'iglu_uri' key missing")
 	}
 
 	if _, ok := attr["payload"]; !ok {
-		return nil, fmt.Errorf("Invalid context attributes: 'payload' key missing")
+		return nil, fmt.Errorf("Invalid attributes: 'payload' key missing")
 	}
 
-	contextData, err := stringToMap(attr["payload"].(string))
-	if err != nil {
-		return nil, err
+	payload := attr["payload"].(map[string]interface{})
+	payloadCopy := make(map[string]interface{})
+
+	for k, v := range payload {
+		// Attempt type assertions
+		maybeFloat, err := strconv.ParseFloat(v.(string), 64)
+		if err == nil {
+			payloadCopy[k] = maybeFloat
+			continue
+		}
+
+		maybeInt, err := strconv.Atoi(v.(string))
+		if err == nil {
+			payloadCopy[k] = maybeInt
+			continue
+		}
+
+		maybeBool, err := strconv.ParseBool(v.(string))
+		if err == nil {
+			payloadCopy[k] = maybeBool
+			continue
+		}
+
+		// Pass the default value in
+		payloadCopy[k] = v
 	}
 
 	sdj := gt.InitSelfDescribingJson(
 		attr["iglu_uri"].(string),
-		contextData,
+		payloadCopy,
 	)
 
 	return sdj, nil

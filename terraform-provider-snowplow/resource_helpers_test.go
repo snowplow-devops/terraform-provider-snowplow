@@ -14,7 +14,6 @@
 package main
 
 import (
-	"encoding/json"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -39,32 +38,12 @@ func TestParseStatusCode_4xx5xx(t *testing.T) {
 	assert.NotNil(err)
 }
 
-func TestStringToMap(t *testing.T) {
-	assert := assert.New(t)
-
-	m, err := stringToMap("{\"hello\":\"world\"}")
-	assert.Nil(err)
-	assert.NotNil(m)
-	assert.Equal("world", m["hello"])
-	assert.Equal(1, len(m))
-
-	m, err = stringToMap("{\"hello\"}")
-	assert.NotNil(err)
-	assert.Nil(m)
-
-	m, err = stringToMap("{\"timestamp\":1534429336}")
-	assert.Nil(err)
-	assert.NotNil(m)
-	assert.Equal(json.Number("1534429336"), m["timestamp"])
-	assert.Equal(1, len(m))
-}
-
 func TestContextsFromList_Valid(t *testing.T) {
 	assert := assert.New(t)
 
 	contextList := make([]interface{}, 0, 2)
-	contextList = append(contextList, map[string]interface{}{"iglu_uri": "iglu:com.acme/context_1/jsonschema/1-0-0", "payload": "{\"foo\":\"bar\"}"})
-	contextList = append(contextList, map[string]interface{}{"iglu_uri": "iglu:com.acme/context_2/jsonschema/1-0-0", "payload": "{\"foo2\":\"bar2\"}"})
+	contextList = append(contextList, map[string]interface{}{"iglu_uri": "iglu:com.acme/context_1/jsonschema/1-0-0", "payload": map[string]interface{}{"foo": "bar"}})
+	contextList = append(contextList, map[string]interface{}{"iglu_uri": "iglu:com.acme/context_2/jsonschema/1-0-0", "payload": map[string]interface{}{"foo2": "bar2"}})
 
 	contextSdeList, err := contextsFromList(contextList)
 	assert.Nil(err)
@@ -76,7 +55,7 @@ func TestContextsFromList_NoIgluUri(t *testing.T) {
 	assert := assert.New(t)
 
 	contextList := make([]interface{}, 0, 1)
-	contextList = append(contextList, map[string]interface{}{"iglu_uriss": "iglu:com.acme/context_1/jsonschema/1-0-0", "payload": "{\"foo\":\"bar\"}"})
+	contextList = append(contextList, map[string]interface{}{"iglu_uriss": "iglu:com.acme/context_1/jsonschema/1-0-0", "payload": map[string]interface{}{"foo": "bar"}})
 
 	contextSdeList, err := contextsFromList(contextList)
 	assert.NotNil(err)
@@ -87,7 +66,7 @@ func TestContextsFromList_NoPayload(t *testing.T) {
 	assert := assert.New(t)
 
 	contextList := make([]interface{}, 0, 1)
-	contextList = append(contextList, map[string]interface{}{"iglu_uri": "iglu:com.acme/context_1/jsonschema/1-0-0", "payloadsss": "{\"foo\":\"bar\"}"})
+	contextList = append(contextList, map[string]interface{}{"iglu_uri": "iglu:com.acme/context_1/jsonschema/1-0-0", "payloadsss": map[string]interface{}{"foo": "bar"}})
 
 	contextSdeList, err := contextsFromList(contextList)
 	assert.NotNil(err)
