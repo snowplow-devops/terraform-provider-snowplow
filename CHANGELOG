@@ -1,3 +1,7 @@
+Version 0.3.0 (2020-09-08)
+--------------------------
+Bump Terraform version to support v0.12+ (#9)
+
 Version 0.2.0 (2020-05-16)
 --------------------------
 Migrate to go mods and update dependencies (#4)
