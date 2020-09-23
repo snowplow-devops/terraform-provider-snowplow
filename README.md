@@ -8,27 +8,25 @@ Terraform provider for emitting Snowplow events.
 
 ## Quick start
 
-Assuming git, **[Vagrant][vagrant-url]** and **[VirtualBox][virtualbox-url]** installed:
+Assuming git is installed:
 
 ```bash
  host> git clone https://github.com/snowplow-devops/terraform-provider-snowplow
  host> cd terraform-provider-snowplow
- host> vagrant up && vagrant ssh
-guest> cd /opt/gopath/src/github.com/snowplow/terraform-provider-snowplow
-guest> make test
-guest> make
+ host> make test
+ host> make
 ```
 
 To remove all build files:
 
 ```bash
-guest> make clean
+ host> make clean
 ```
 
 To format the golang code in the source directory:
 
 ```bash
-guest> make format
+ host> make format
 ```
 
 **Note:** Always run `format` before submitting any code.
@@ -163,6 +161,3 @@ limitations under the License.
 
 [goreport-image]: https://goreportcard.com/badge/github.com/snowplow-devops/terraform-provider-snowplow
 [goreport]: https://goreportcard.com/report/github.com/snowplow-devops/terraform-provider-snowplow
-
-[vagrant-url]: http://docs.vagrantup.com/v2/installation/index.html
-[virtualbox-url]: https://www.virtualbox.org/wiki/Downloads
