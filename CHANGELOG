@@ -1,3 +1,9 @@
+Version 0.3.1 (2020-09-23)
+--------------------------
+Migrate CI/CD to Github actions (#13)
+Add Snyk monitoring (#12)
+Remove Vagrant (#11)
+
 Version 0.3.0 (2020-09-08)
 --------------------------
 Bump Terraform version to support v0.12+ (#9)
