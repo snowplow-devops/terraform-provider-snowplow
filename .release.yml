@@ -1,6 +1,6 @@
 ---
 local:
-  root_dir : <%= ENV['TRAVIS_BUILD_DIR'] %>
+  root_dir : <%= ENV['GITHUB_WORKSPACE'] %>
 
 targets:
   - type     : "bintray"
@@ -15,7 +15,7 @@ packages:
     override : false
     continue_on_conflict: false
     version  : <%= CMD['cat VERSION'] %>
-    build_version : <%= ENV['TRAVIS_TAG'] %>
+    build_version : <%= ENV['GITHUB_TAG'] %>
 
     artifacts:
       - prefix : "terraform_provider_snowplow_"
