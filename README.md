@@ -1,4 +1,4 @@
-`# Snowplow Terraform Provider
+# Snowplow Terraform Provider
 
 [![Actions Status][actions-image]][actions] [![Go Report Card][goreport-image]][goreport] [![Release][release-image]][releases] [![License][license-image]][license]
 
