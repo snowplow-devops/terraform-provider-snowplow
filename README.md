@@ -1,4 +1,4 @@
-# Snowplow Terraform Provider
+`# Snowplow Terraform Provider
 
 [![Actions Status][actions-image]][actions] [![Go Report Card][goreport-image]][goreport] [![Release][release-image]][releases] [![License][license-image]][license]
 
@@ -35,13 +35,9 @@ To format the golang code in the source directory:
 
 ## Installation
 
-First download the pre-compiled binary for your platform from our Bintray at the following links or generate the binaries locally using the provided `make` command:
+First download the pre-compiled binary for your platform from the release assets at the following links or generate the binaries locally using the provided `make` command:
 
-* [Darwin (macOS)](https://bintray.com/snowplow/snowplow-generic/download_file?file_path=terraform_provider_snowplow_0.3.1_darwin_amd64.zip)
-* [Linux](https://bintray.com/snowplow/snowplow-generic/download_file?file_path=terraform_provider_snowplow_0.3.1_linux_amd64.zip)
-* [Windows](https://bintray.com/snowplow/snowplow-generic/download_file?file_path=terraform_provider_snowplow_0.3.1_windows_amd64.zip)
-
-Once downloaded "unzip" to extract the binary which should be called `terraform-provider-snowplow_v0.3.1`.
+https://github.com/snowplow-devops/terraform-provider-snowplow/releases/latest
 
 From here you will need to move the binary into your Terraform plugins directory - depending on your platform / installation this might change but generally speaking they are located at:
 
@@ -153,7 +149,7 @@ limitations under the License.
 [actions-image]: https://github.com/snowplow-devops/terraform-provider-snowplow/workflows/ci/badge.svg
 [actions]: https://github.com/snowplow-devops/terraform-provider-snowplow/actions
 
-[release-image]: http://img.shields.io/badge/release-0.3.1-6ad7e5.svg?style=flat
+[release-image]: http://img.shields.io/badge/release-0.3.2-6ad7e5.svg?style=flat
 [releases]: https://github.com/snowplow-devops/terraform-provider-snowplow/releases
 
 [license-image]: http://img.shields.io/badge/license-Apache--2-blue.svg?style=flat
