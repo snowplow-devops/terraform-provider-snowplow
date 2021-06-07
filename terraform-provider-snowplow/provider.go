@@ -14,7 +14,10 @@
 package main
 
 import (
+	"errors"
+
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/imdario/mergo"
 	gt "github.com/snowplow/snowplow-golang-tracker/v2/tracker"
 )
 
@@ -34,8 +37,10 @@ func Provider() *schema.Provider {
 		Schema: map[string]*schema.Schema{
 			"collector_uri": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
+				Required:    false,
 				Description: "URI of your Snowplow Collector",
+				Default:     "",
 			},
 			"tracker_app_id": {
 				Type:        schema.TypeString,
@@ -96,7 +101,16 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 
 // InitTracker takes a context and a channel of size 1 and returns
 // a new Snowplow Tracker ready to create a resource
-func InitTracker(ctx Context, trackerChan chan int) *gt.Tracker {
+func InitTracker(ctx Context, ctxResource Context, trackerChan chan int) (*gt.Tracker, error) {
+	// Merge the provider and resource contexts together
+	if err := mergo.Merge(&ctx, ctxResource, mergo.WithOverride); err != nil {
+		return nil, err
+	}
+
+	if ctx.CollectorURI == "" {
+		return nil, errors.New("URI of the Snowplow Collector is empty - this can be set either at the provider or resource level with the 'collector_uri' input")
+	}
+
 	callback := func(s []gt.CallbackResult, f []gt.CallbackResult) {
 		status := 0
 
@@ -128,5 +142,5 @@ func InitTracker(ctx Context, trackerChan chan int) *gt.Tracker {
 		gt.OptionBase64Encode(true),
 	)
 
-	return tracker
+	return tracker, nil
 }

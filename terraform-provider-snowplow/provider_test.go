@@ -30,8 +30,74 @@ func TestInitTracker(t *testing.T) {
 		EmitterRequestType: "GET",
 		EmitterProtocol:    "HTTP",
 	}
+	ctxR := Context{
+		CollectorURI:       "",
+		TrackerAppID:       "",
+		TrackerNamespace:   "",
+		TrackerPlatform:    "",
+		EmitterRequestType: "",
+		EmitterProtocol:    "",
+	}
 
 	trackerChan := make(chan int, 1)
-	tracker := InitTracker(ctx, trackerChan)
+	tracker, err := InitTracker(ctx, ctxR, trackerChan)
 	assert.NotNil(tracker)
+	assert.Nil(err)
+	assert.Equal("http://com.acme/i", tracker.Emitter.GetCollectorUrl())
+}
+
+func TestInitTracker_WithOverrides(t *testing.T) {
+	assert := assert.New(t)
+
+	// Setup Tracker
+	ctx := Context{
+		CollectorURI:       "com.acme",
+		TrackerAppID:       "",
+		TrackerNamespace:   "",
+		TrackerPlatform:    "srv",
+		EmitterRequestType: "GET",
+		EmitterProtocol:    "HTTP",
+	}
+	ctxR := Context{
+		CollectorURI:       "com.acme.override",
+		TrackerAppID:       "",
+		TrackerNamespace:   "",
+		TrackerPlatform:    "",
+		EmitterRequestType: "",
+		EmitterProtocol:    "",
+	}
+
+	trackerChan := make(chan int, 1)
+	tracker, err := InitTracker(ctx, ctxR, trackerChan)
+	assert.NotNil(tracker)
+	assert.Nil(err)
+	assert.Equal("http://com.acme.override/i", tracker.Emitter.GetCollectorUrl())
+}
+
+func TestInitTracker_WithEmptyCollectorURI(t *testing.T) {
+	assert := assert.New(t)
+
+	// Setup Tracker
+	ctx := Context{
+		CollectorURI:       "",
+		TrackerAppID:       "",
+		TrackerNamespace:   "",
+		TrackerPlatform:    "srv",
+		EmitterRequestType: "GET",
+		EmitterProtocol:    "HTTP",
+	}
+	ctxR := Context{
+		CollectorURI:       "",
+		TrackerAppID:       "",
+		TrackerNamespace:   "",
+		TrackerPlatform:    "",
+		EmitterRequestType: "",
+		EmitterProtocol:    "",
+	}
+
+	trackerChan := make(chan int, 1)
+	tracker, err := InitTracker(ctx, ctxR, trackerChan)
+	assert.Nil(tracker)
+	assert.NotNil(err)
+	assert.Equal("URI of the Snowplow Collector is empty - this can be set either at the provider or resource level with the 'collector_uri' input", err.Error())
 }
