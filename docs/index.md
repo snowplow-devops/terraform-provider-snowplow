@@ -25,6 +25,8 @@ provider "snowplow" {
 
 Now that the provider is configured we can track an event!
 
+Note: All provider settings can also be configured directly in the resource.
+
 #### How to track: `self_describing_event` ####
 
 ```hcl
@@ -62,7 +64,7 @@ resource "snowplow_track_self_describing_event" "module_action" {
 
 ## Argument Reference ##
 
-* `collector_uri` (Required) URI of your Snowplow Collector
+* `collector_uri` (Optional) URI of your Snowplow Collector (Default: "")
 * `tracker_app_id` (Optional) Optional application ID (Default: "")
 * `tracker_namespace` (Optional) Optional namespace (Default: "")
 * `tracker_platform` (Optional) Optional platform (Default: srv)

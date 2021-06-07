@@ -36,3 +36,9 @@ resource "snowplow_track_self_describing_event" "module_action" {
 * `update_event` - Event emmitted during update of this TF resource
 * `delete_event` - Event emmitted during deletion of this TF resource
 * `contexts` - A payload containing additional context
+* `collector_uri` (Optional) URI of your Snowplow Collector (Default: "")
+* `tracker_app_id` (Optional) Optional application ID (Default: "")
+* `tracker_namespace` (Optional) Optional namespace (Default: "")
+* `tracker_platform` (Optional) Optional platform (Default: "")
+* `emitter_request_type` (Optional) Whether to use GET or POST requests to emit events (Default: "")
+* `emitter_protocol` (Optional) Whether to use HTTP or HTTPS to send events (Default: "")
