@@ -43,6 +43,48 @@ func resourceTrackSelfDescribingEvent() *schema.Resource {
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeMap},
 			},
+			"collector_uri": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Required:    false,
+				Description: "URI of your Snowplow Collector",
+				Default:     "",
+			},
+			"tracker_app_id": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Required:    false,
+				Description: "Optional application ID",
+				Default:     "",
+			},
+			"tracker_namespace": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Required:    false,
+				Description: "Optional namespace",
+				Default:     "",
+			},
+			"tracker_platform": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Required:    false,
+				Description: "Optional platform",
+				Default:     "",
+			},
+			"emitter_request_type": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Required:    false,
+				Description: "Whether to use GET or POST requests to emit events",
+				Default:     "",
+			},
+			"emitter_protocol": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Required:    false,
+				Description: "Whether to use HTTP or HTTPS to send events",
+				Default:     "",
+			},
 		},
 	}
 }
@@ -50,8 +92,17 @@ func resourceTrackSelfDescribingEvent() *schema.Resource {
 func trackSelfDescribingEvent(d *schema.ResourceData, m interface{}, lifecycleEventMap map[string]interface{}) error {
 	ctx := m.(*Context)
 
+	ctxResource, err := providerConfigure(d)
+	if err != nil {
+		return err
+	}
+	ctxResourceCast := ctxResource.(*Context)
+
 	trackerChan := make(chan int, 1)
-	tracker := InitTracker(*ctx, trackerChan)
+	tracker, err := InitTracker(*ctx, *ctxResourceCast, trackerChan)
+	if err != nil {
+		return err
+	}
 
 	contexts, err := contextsFromList(d.Get("contexts").([]interface{}))
 	if err != nil {
