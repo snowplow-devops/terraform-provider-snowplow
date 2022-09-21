@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2019-2020 Snowplow Analytics Ltd. All rights reserved.
+// Copyright (c) 2019-2022 Snowplow Analytics Ltd. All rights reserved.
 //
 // This program is licensed to you under the Apache License Version 2.0,
 // and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -14,13 +14,13 @@
 package main
 
 import (
-	"github.com/hashicorp/terraform/plugin"
-	"github.com/hashicorp/terraform/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
 )
 
 func main() {
 	plugin.Serve(&plugin.ServeOpts{
-		ProviderFunc: func() terraform.ResourceProvider {
+		ProviderFunc: func() *schema.Provider {
 			return Provider()
 		},
 	})

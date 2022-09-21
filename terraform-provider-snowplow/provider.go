@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2019-2020 Snowplow Analytics Ltd. All rights reserved.
+// Copyright (c) 2019-2022 Snowplow Analytics Ltd. All rights reserved.
 //
 // This program is licensed to you under the Apache License Version 2.0,
 // and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -16,7 +16,7 @@ package main
 import (
 	"errors"
 
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/imdario/mergo"
 	gt "github.com/snowplow/snowplow-golang-tracker/v2/tracker"
 )

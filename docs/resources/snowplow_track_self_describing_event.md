@@ -32,9 +32,9 @@ resource "snowplow_track_self_describing_event" "module_action" {
 
 ## Argument Reference
 
-* `create_event` - Event emmitted during creation of this TF resource
-* `update_event` - Event emmitted during update of this TF resource
-* `delete_event` - Event emmitted during deletion of this TF resource
+* `create_event` - Event emitted during creation of this TF resource
+* `update_event` - Event emitted during update of this TF resource
+* `delete_event` - Event emitted during deletion of this TF resource
 * `contexts` - A payload containing additional context
 * `collector_uri` (Optional) URI of your Snowplow Collector (Default: "")
 * `tracker_app_id` (Optional) Optional application ID (Default: "")
