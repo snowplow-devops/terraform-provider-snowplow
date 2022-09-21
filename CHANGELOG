@@ -1,3 +1,9 @@
+Version 0.7.0 (2022-09-21)
+--------------------------
+Fix typo in docs (#24)
+Bump Go Version to 1.18 (#25)
+Bump copyright to 2019-2022 (#26)
+
 Version 0.6.0 (2021-08-17)
 --------------------------
 Add Darwin arm64 support (#22)
