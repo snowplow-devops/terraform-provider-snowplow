@@ -135,7 +135,7 @@ This is handled through CI/CD on Github Actions. However all binaries will be ge
 
 ### Copyright and license
 
-Snowplow Terraform Provider is copyright 2019-2020 Snowplow Analytics Ltd.
+Snowplow Terraform Provider is copyright 2019-2022 Snowplow Analytics Ltd.
 
 Licensed under the **[Apache License, Version 2.0][license]** (the "License");
 you may not use this software except in compliance with the License.
