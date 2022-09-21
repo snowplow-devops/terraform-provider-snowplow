@@ -14,7 +14,7 @@
 package main
 
 import (
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gt "github.com/snowplow/snowplow-golang-tracker/v2/tracker"
 )
 

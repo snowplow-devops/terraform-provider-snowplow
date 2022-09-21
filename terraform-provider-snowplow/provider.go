@@ -16,7 +16,7 @@ package main
 import (
 	"errors"
 
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/imdario/mergo"
 	gt "github.com/snowplow/snowplow-golang-tracker/v2/tracker"
 )
