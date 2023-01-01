@@ -1,3 +1,7 @@
+Version 0.7.1 (2023-01-02)
+--------------------------
+Bump dependencies for Snyk (#28)
+
 Version 0.7.0 (2022-09-21)
 --------------------------
 Fix typo in docs (#24)
