@@ -4,6 +4,7 @@ Bump Go Version to 1.20 (#34)
 Bump dependencies for Snyk (#33)
 Fix Denial of Service (DoS) in golang.org/x/net/http2/hpack (#32)
 Fix Denial of Service (DoS) in golang.org/x/net/http2 (#31)
+Update copyright to 2019-2023 (#35)
 
 Version 0.7.1 (2023-01-02)
 --------------------------

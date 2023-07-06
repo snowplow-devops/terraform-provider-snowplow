@@ -30,8 +30,7 @@ bin_windows   = $(windows_dir)/$(bin_name)
 # -----------------------------------------------------------------------------
 
 all:
-	GO111MODULE=on go get -u github.com/mitchellh/gox
-	GO111MODULE=on go install github.com/mitchellh/gox
+	GO111MODULE=on go install github.com/mitchellh/gox@latest
 	GO111MODULE=on gox -osarch=linux/amd64 -output=$(bin_linux) ./$(src_dir)
 	GO111MODULE=on gox -osarch=darwin/amd64 -output=$(bin_darwin) ./$(src_dir)
 	GO111MODULE=on gox -osarch=windows/amd64 -output=$(bin_windows) ./$(src_dir)
