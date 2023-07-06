@@ -149,7 +149,7 @@ limitations under the License.
 [actions-image]: https://github.com/snowplow-devops/terraform-provider-snowplow/workflows/ci/badge.svg
 [actions]: https://github.com/snowplow-devops/terraform-provider-snowplow/actions
 
-[release-image]: http://img.shields.io/badge/release-0.7.1-6ad7e5.svg?style=flat
+[release-image]: http://img.shields.io/badge/release-0.7.2-6ad7e5.svg?style=flat
 [releases]: https://github.com/snowplow-devops/terraform-provider-snowplow/releases
 
 [license-image]: http://img.shields.io/badge/license-Apache--2-blue.svg?style=flat
