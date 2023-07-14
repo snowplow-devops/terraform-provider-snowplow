@@ -1,4 +1,4 @@
-Version 0.7.2 (2023-07-06)
+Version 0.7.2 (2023-07-14)
 --------------------------
 Bump Go Version to 1.20 (#34)
 Bump dependencies for Snyk (#33)
