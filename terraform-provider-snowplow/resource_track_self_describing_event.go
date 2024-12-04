@@ -21,7 +21,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	gt "github.com/snowplow/snowplow-golang-tracker/v2/tracker"
 )
@@ -99,23 +98,17 @@ func (r *TrackSelfDescribingEventResource) Schema(ctx context.Context, req resou
 			"tracker_platform": schema.StringAttribute{
 				Optional:    true,
 				Required:    false,
-				Computed:    true,
 				Description: "Optional platform",
-				Default:     stringdefault.StaticString("srv"),
 			},
 			"emitter_request_type": schema.StringAttribute{
 				Optional:    true,
 				Required:    false,
-				Computed:    true,
 				Description: "Whether to use GET or POST requests to emit events",
-				Default:     stringdefault.StaticString("POST"),
 			},
 			"emitter_protocol": schema.StringAttribute{
 				Optional:    true,
 				Required:    false,
-				Computed:    true,
 				Description: "Whether to use HTTP or HTTPS to send events",
-				Default:     stringdefault.StaticString("HTTPS"),
 			},
 		},
 	}

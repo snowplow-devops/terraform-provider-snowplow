@@ -105,6 +105,16 @@ func (p *SnowplowProvider) Configure(ctx context.Context, req provider.Configure
 		return
 	}
 
+	if data.EmitterRequestType.ValueString() == "" {
+		data.EmitterRequestType = types.StringValue("POST")
+	}
+	if data.EmitterProtocol.ValueString() == "" {
+		data.EmitterProtocol = types.StringValue("HTTPS")
+	}
+	if data.TrackerPlatform.ValueString() == "" {
+		data.TrackerPlatform = types.StringValue("srv")
+	}
+
 	resp.DataSourceData = data
 	resp.ResourceData = data
 }
@@ -124,44 +134,44 @@ func (p *SnowplowProvider) DataSources(ctx context.Context) []func() datasource.
 func InitTracker(ctx SnowplowProviderModel, ctxResource TrackSelfDescribingEventResourceModel, trackerChan chan int) (*gt.Tracker, error) {
 	var collectorUri, emitterRequestType, emitterProtocol, trackerNamespace, trackerAppId, trackerPlatform string
 
-	if ctxResource.CollectorURI.IsNull() || ctxResource.CollectorURI.ValueString() == "" {
+	if ctxResource.CollectorURI.ValueString() == "" {
 		collectorUri = ctx.CollectorURI.ValueString()
 	} else {
 		collectorUri = ctxResource.CollectorURI.ValueString()
 	}
 
-	if ctxResource.EmitterRequestType.IsNull() || ctxResource.EmitterRequestType.ValueString() == "" {
+	if collectorUri == "" {
+		return nil, errors.New("URI of the Snowplow Collector is empty - this can be set either at the provider or resource level with the 'collector_uri' input")
+	}
+
+	if ctxResource.EmitterRequestType.ValueString() == "" {
 		emitterRequestType = ctx.EmitterRequestType.ValueString()
 	} else {
 		emitterRequestType = ctxResource.EmitterRequestType.ValueString()
 	}
 
-	if ctxResource.EmitterProtocol.IsNull() || ctxResource.EmitterProtocol.ValueString() == "" {
+	if ctxResource.EmitterProtocol.ValueString() == "" {
 		emitterProtocol = ctx.EmitterProtocol.ValueString()
 	} else {
 		emitterProtocol = ctxResource.EmitterProtocol.ValueString()
 	}
 
-	if ctxResource.TrackerNamespace.IsNull() || ctxResource.TrackerNamespace.ValueString() == "" {
+	if ctxResource.TrackerNamespace.IsNull() {
 		trackerNamespace = ctx.TrackerNamespace.ValueString()
 	} else {
 		trackerNamespace = ctxResource.TrackerNamespace.ValueString()
 	}
 
-	if ctxResource.TrackerAppID.IsNull() || ctxResource.TrackerAppID.ValueString() == "" {
+	if ctxResource.TrackerAppID.IsNull() {
 		trackerAppId = ctx.TrackerAppID.ValueString()
 	} else {
 		trackerAppId = ctxResource.TrackerAppID.ValueString()
 	}
 
-	if ctxResource.TrackerPlatform.IsNull() || ctxResource.TrackerPlatform.ValueString() == "" {
+	if ctxResource.TrackerPlatform.IsNull() {
 		trackerPlatform = ctx.TrackerPlatform.ValueString()
 	} else {
 		trackerPlatform = ctxResource.TrackerPlatform.ValueString()
-	}
-
-	if collectorUri == "" {
-		return nil, errors.New("URI of the Snowplow Collector is empty - this can be set either at the provider or resource level with the 'collector_uri' input")
 	}
 
 	callback := func(s []gt.CallbackResult, f []gt.CallbackResult) {
