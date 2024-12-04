@@ -109,6 +109,29 @@ func TestInitTracker_WithEmptyCollectorURI(t *testing.T) {
 }
 
 func TestResource_UpgradeFromVersion(t *testing.T) {
+	config := `resource "snowplow_track_self_describing_event" "example" {
+		collector_uri = "localhost:9090"
+		emitter_protocol = "HTTP"
+		contexts = []
+		create_event = {
+			iglu_uri = "iglu:com.example/create/jsonschema/1-0-0"
+			payload = jsonencode({
+				empty = true
+			})
+		}
+		update_event = {
+			iglu_uri = "iglu:com.example/update/jsonschema/1-0-0"
+			payload = jsonencode({
+				empty = true
+			})
+		}
+		delete_event = {
+			iglu_uri = "iglu:com.example/delete/jsonschema/1-0-0"
+			payload = jsonencode({
+				empty = true
+			})
+		}
+	}`
 	resource.Test(t, resource.TestCase{
 		Steps: []resource.TestStep{
 			{
@@ -118,30 +141,7 @@ func TestResource_UpgradeFromVersion(t *testing.T) {
 						Source:            "snowplow-devops/snowplow",
 					},
 				},
-				Config: `resource "snowplow_track_self_describing_event" "example" {
-					collector_uri = "localhost:9090"
-					emitter_protocol = "HTTP"
-					emitter_request_type = "POST"
-					contexts = []
-					create_event = {
-						iglu_uri = "iglu:com.example/create/jsonschema/1-0-0"
-						payload = jsonencode({
-							empty = true
-						})
-					}
-					update_event = {
-						iglu_uri = "iglu:com.example/update/jsonschema/1-0-0"
-						payload = jsonencode({
-							empty = true
-						})
-					}
-					delete_event = {
-						iglu_uri = "iglu:com.example/delete/jsonschema/1-0-0"
-						payload = jsonencode({
-							empty = true
-						})
-					}
-				}`,
+				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("snowplow_track_self_describing_event.example", "collector_uri", "localhost:9090"),
 					resource.TestCheckResourceAttr("snowplow_track_self_describing_event.example", "emitter_protocol", "HTTP"),
@@ -151,32 +151,13 @@ func TestResource_UpgradeFromVersion(t *testing.T) {
 				ProtoV5ProviderFactories: map[string]func() (tfprotov5.ProviderServer, error){
 					"snowplow": providerserver.NewProtocol5WithError(NewProvider("dev")()),
 				},
-				Config: `resource "snowplow_track_self_describing_event" "example" {
-					collector_uri = "localhost:9090"
-					emitter_protocol = "HTTP"
-					contexts = []
-					create_event = {
-						iglu_uri = "iglu:com.example/create/jsonschema/1-0-0"
-						payload = jsonencode({
-							empty = true
-						})
-					}
-					update_event = {
-						iglu_uri = "iglu:com.example/update/jsonschema/1-0-0"
-						payload = jsonencode({
-							empty = true
-						})
-					}
-					delete_event = {
-						iglu_uri = "iglu:com.example/delete/jsonschema/1-0-0"
-						payload = jsonencode({
-							empty = true
-						})
-					}
-				}`,
+				Config: config,
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{
-						plancheck.ExpectResourceAction("snowplow_track_self_describing_event.example", plancheck.ResourceActionUpdate),
+						plancheck.ExpectResourceAction(
+							"snowplow_track_self_describing_event.example",
+							plancheck.ResourceActionNoop,
+						),
 					},
 				},
 			},
