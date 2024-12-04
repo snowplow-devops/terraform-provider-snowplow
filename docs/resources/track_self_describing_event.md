@@ -1,3 +1,10 @@
+---
+page_title: "snowplow_track_self_describing_event Resource - Snowplow"
+subcategory: ""
+description: |-
+  Emits an event to the configured collector upon creation, update, or deletion of the resource.
+---
+
 # snowplow_track_self_describing_event Resource
 
 Emits an event to the configured collector upon creation, update, or deletion of the resource.

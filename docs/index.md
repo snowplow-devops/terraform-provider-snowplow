@@ -1,3 +1,10 @@
+---
+page_title: "Snowplow Provider"
+subcategory: ""
+description: |-
+  Terraform provider for emitting Snowplow events
+---
+
 # Snowplow Provider
 
 Terraform provider for emitting Snowplow events
