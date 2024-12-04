@@ -60,6 +60,7 @@ func (p *SnowplowProvider) Metadata(ctx context.Context, req provider.MetadataRe
 
 func (p *SnowplowProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		Description: "Terraform provider for emitting Snowplow events",
 		Attributes: map[string]schema.Attribute{
 			"collector_uri": schema.StringAttribute{
 				Optional:    true,

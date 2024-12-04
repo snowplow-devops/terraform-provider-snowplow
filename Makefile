@@ -1,4 +1,4 @@
-.PHONY: all format lint tidy test dep clean
+.PHONY: all format lint tidy test dep clean docs
 
 # -----------------------------------------------------------------------------
 #  CONSTANTS
@@ -9,6 +9,9 @@ version = `cat VERSION`
 src_dir := terraform-provider-snowplow
 
 build_dir = build
+docs_dir = docs
+examples_dir = examples
+templates_dir = templates
 
 coverage_dir  = $(build_dir)/coverage
 coverage_out  = $(coverage_dir)/coverage.out
@@ -34,6 +37,15 @@ all:
 	GO111MODULE=on gox -osarch=linux/amd64 -output=$(bin_linux) ./$(src_dir)
 	GO111MODULE=on gox -osarch=darwin/amd64 -output=$(bin_darwin) ./$(src_dir)
 	GO111MODULE=on gox -osarch=windows/amd64 -output=$(bin_windows) ./$(src_dir)
+
+docs:
+	tfplugindocs generate \
+		--rendered-provider-name Snowplow \
+		--provider-name snowplow \
+		--provider-dir ./$(src_dir) \
+		--rendered-website-dir ../$(docs_dir) \
+		--examples-dir ../$(examples_dir) \
+		--website-source-dir ../$(templates_dir) \
 
 # -----------------------------------------------------------------------------
 #  FORMATTING

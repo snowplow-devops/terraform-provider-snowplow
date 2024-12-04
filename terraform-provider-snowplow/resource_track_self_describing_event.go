@@ -58,6 +58,7 @@ func (r *TrackSelfDescribingEventResource) Metadata(ctx context.Context, req res
 
 func (r *TrackSelfDescribingEventResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		Description: "Emits an event to the configured collector upon creation, update, or deletion of the resource.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed: true,

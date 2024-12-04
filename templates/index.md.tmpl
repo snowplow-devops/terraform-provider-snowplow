@@ -1,0 +1,19 @@
+# {{ .RenderedProviderName }} Provider
+
+{{ .Description }}
+
+## Example Usage
+
+To actually start tracking Snowplow events from Terraform you will need to configure the `provider` and a `resource`:
+
+{{tffile "../examples/example_1.tf"}}
+
+Now that the provider is configured we can track an event!
+
+Note: All provider settings can also be configured directly in the resource.
+
+#### How to track: `self_describing_event`
+
+{{tffile "../examples/example_2.tf"}}
+
+{{ .SchemaMarkdown }}
