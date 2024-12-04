@@ -29,6 +29,12 @@ To format the golang code in the source directory:
  host> make format
 ```
 
+To update documentation with any changes:
+
+```bash
+ host> make docs
+```
+
 **Note:** Always run `format` before submitting any code.
 
 **Note:** The `make test` command also generates a code coverage file which can be found at `build/coverage/coverage.html`.
