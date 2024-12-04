@@ -14,100 +14,152 @@
 package main
 
 import (
+	"context"
 	"errors"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/imdario/mergo"
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/provider"
+	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+
 	gt "github.com/snowplow/snowplow-golang-tracker/v2/tracker"
 )
 
-// Context the struct made from the provider input options
-type Context struct {
-	CollectorURI       string
-	TrackerAppID       string
-	TrackerNamespace   string
-	TrackerPlatform    string
-	EmitterRequestType string
-	EmitterProtocol    string
+// Ensure ScaffoldingProvider satisfies various provider interfaces.
+var _ provider.Provider = &SnowplowProvider{}
+
+// SnowplowProviderModel the struct made from the provider input options
+type SnowplowProviderModel struct {
+	CollectorURI       types.String `tfsdk:"collector_uri"`
+	TrackerAppID       types.String `tfsdk:"tracker_app_id"`
+	TrackerNamespace   types.String `tfsdk:"tracker_namespace"`
+	TrackerPlatform    types.String `tfsdk:"tracker_platform"`
+	EmitterRequestType types.String `tfsdk:"emitter_request_type"`
+	EmitterProtocol    types.String `tfsdk:"emitter_protocol"`
 }
 
-// Provider creates a new provider struct ready for use by Terraform
-func Provider() *schema.Provider {
-	return &schema.Provider{
-		Schema: map[string]*schema.Schema{
-			"collector_uri": {
-				Type:        schema.TypeString,
+// SnowplowProvider defines the provider implementation.
+type SnowplowProvider struct {
+	// version is set to the provider version on release, "dev" when the
+	// provider is built and ran locally, and "test" when running acceptance
+	// testing.
+	version string
+}
+
+func NewProvider(version string) func() provider.Provider {
+	return func() provider.Provider {
+		return &SnowplowProvider{version: version}
+	}
+}
+
+func (p *SnowplowProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
+	resp.TypeName = "snowplow"
+	resp.Version = p.version
+}
+
+func (p *SnowplowProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
+	resp.Schema = schema.Schema{
+		Attributes: map[string]schema.Attribute{
+			"collector_uri": schema.StringAttribute{
 				Optional:    true,
 				Required:    false,
 				Description: "URI of your Snowplow Collector",
-				Default:     "",
 			},
-			"tracker_app_id": {
-				Type:        schema.TypeString,
+			"tracker_app_id": schema.StringAttribute{
 				Optional:    true,
 				Required:    false,
 				Description: "Optional application ID",
-				Default:     "",
 			},
-			"tracker_namespace": {
-				Type:        schema.TypeString,
+			"tracker_namespace": schema.StringAttribute{
 				Optional:    true,
 				Required:    false,
 				Description: "Optional namespace",
-				Default:     "",
 			},
-			"tracker_platform": {
-				Type:        schema.TypeString,
+			"tracker_platform": schema.StringAttribute{
 				Optional:    true,
 				Required:    false,
 				Description: "Optional platform",
-				Default:     "srv",
 			},
-			"emitter_request_type": {
-				Type:        schema.TypeString,
+			"emitter_request_type": schema.StringAttribute{
 				Optional:    true,
 				Required:    false,
 				Description: "Whether to use GET or POST requests to emit events",
-				Default:     "POST",
 			},
-			"emitter_protocol": {
-				Type:        schema.TypeString,
+			"emitter_protocol": schema.StringAttribute{
 				Optional:    true,
 				Required:    false,
 				Description: "Whether to use HTTP or HTTPS to send events",
-				Default:     "HTTPS",
 			},
 		},
-		ResourcesMap: map[string]*schema.Resource{
-			"snowplow_track_self_describing_event": resourceTrackSelfDescribingEvent(),
-		},
-		DataSourcesMap: map[string]*schema.Resource{},
-		ConfigureFunc:  providerConfigure,
 	}
 }
 
-func providerConfigure(d *schema.ResourceData) (interface{}, error) {
-	ctx := Context{
-		CollectorURI:       d.Get("collector_uri").(string),
-		TrackerAppID:       d.Get("tracker_app_id").(string),
-		TrackerNamespace:   d.Get("tracker_namespace").(string),
-		TrackerPlatform:    d.Get("tracker_platform").(string),
-		EmitterRequestType: d.Get("emitter_request_type").(string),
-		EmitterProtocol:    d.Get("emitter_protocol").(string),
+func (p *SnowplowProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
+	var data SnowplowProviderModel
+
+	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
 	}
 
-	return &ctx, nil
+	resp.DataSourceData = data
+	resp.ResourceData = data
+}
+
+func (p *SnowplowProvider) Resources(ctx context.Context) []func() resource.Resource {
+	return []func() resource.Resource{
+		NewTrackSelfDescribingEventResource,
+	}
+}
+
+func (p *SnowplowProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
+	return nil
 }
 
 // InitTracker takes a context and a channel of size 1 and returns
 // a new Snowplow Tracker ready to create a resource
-func InitTracker(ctx Context, ctxResource Context, trackerChan chan int) (*gt.Tracker, error) {
-	// Merge the provider and resource contexts together
-	if err := mergo.Merge(&ctx, ctxResource, mergo.WithOverride); err != nil {
-		return nil, err
+func InitTracker(ctx SnowplowProviderModel, ctxResource TrackSelfDescribingEventResourceModel, trackerChan chan int) (*gt.Tracker, error) {
+	var collectorUri, emitterRequestType, emitterProtocol, trackerNamespace, trackerAppId, trackerPlatform string
+
+	if ctxResource.CollectorURI.IsNull() || ctxResource.CollectorURI.ValueString() == "" {
+		collectorUri = ctx.CollectorURI.ValueString()
+	} else {
+		collectorUri = ctxResource.CollectorURI.ValueString()
 	}
 
-	if ctx.CollectorURI == "" {
+	if ctxResource.EmitterRequestType.IsNull() || ctxResource.EmitterRequestType.ValueString() == "" {
+		emitterRequestType = ctx.EmitterRequestType.ValueString()
+	} else {
+		emitterRequestType = ctxResource.EmitterRequestType.ValueString()
+	}
+
+	if ctxResource.EmitterProtocol.IsNull() || ctxResource.EmitterProtocol.ValueString() == "" {
+		emitterProtocol = ctx.EmitterProtocol.ValueString()
+	} else {
+		emitterProtocol = ctxResource.EmitterProtocol.ValueString()
+	}
+
+	if ctxResource.TrackerNamespace.IsNull() || ctxResource.TrackerNamespace.ValueString() == "" {
+		trackerNamespace = ctx.TrackerNamespace.ValueString()
+	} else {
+		trackerNamespace = ctxResource.TrackerNamespace.ValueString()
+	}
+
+	if ctxResource.TrackerAppID.IsNull() || ctxResource.TrackerAppID.ValueString() == "" {
+		trackerAppId = ctx.TrackerAppID.ValueString()
+	} else {
+		trackerAppId = ctxResource.TrackerAppID.ValueString()
+	}
+
+	if ctxResource.TrackerPlatform.IsNull() || ctxResource.TrackerPlatform.ValueString() == "" {
+		trackerPlatform = ctx.TrackerPlatform.ValueString()
+	} else {
+		trackerPlatform = ctxResource.TrackerPlatform.ValueString()
+	}
+
+	if collectorUri == "" {
 		return nil, errors.New("URI of the Snowplow Collector is empty - this can be set either at the provider or resource level with the 'collector_uri' input")
 	}
 
@@ -124,9 +176,9 @@ func InitTracker(ctx Context, ctxResource Context, trackerChan chan int) (*gt.Tr
 	}
 
 	emitter := gt.InitEmitter(
-		gt.RequireCollectorUri(ctx.CollectorURI),
-		gt.OptionRequestType(ctx.EmitterRequestType),
-		gt.OptionProtocol(ctx.EmitterProtocol),
+		gt.RequireCollectorUri(collectorUri),
+		gt.OptionRequestType(emitterRequestType),
+		gt.OptionProtocol(emitterProtocol),
 		gt.OptionCallback(callback),
 		gt.OptionStorage(gt.InitStorageMemory()),
 	)
@@ -136,9 +188,9 @@ func InitTracker(ctx Context, ctxResource Context, trackerChan chan int) (*gt.Tr
 	tracker := gt.InitTracker(
 		gt.RequireEmitter(emitter),
 		gt.OptionSubject(subject),
-		gt.OptionNamespace(ctx.TrackerNamespace),
-		gt.OptionAppId(ctx.TrackerAppID),
-		gt.OptionPlatform(ctx.TrackerPlatform),
+		gt.OptionNamespace(trackerNamespace),
+		gt.OptionAppId(trackerAppId),
+		gt.OptionPlatform(trackerPlatform),
 		gt.OptionBase64Encode(true),
 	)
 

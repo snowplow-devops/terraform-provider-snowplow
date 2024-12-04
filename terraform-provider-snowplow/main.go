@@ -14,14 +14,26 @@
 package main
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
+	"context"
+	"log"
+
+	"github.com/hashicorp/terraform-plugin-framework/providerserver"
+)
+
+var (
+	// these will be set by the goreleaser configuration
+	// to appropriate values for the compiled binary.
+	version string = "dev"
 )
 
 func main() {
-	plugin.Serve(&plugin.ServeOpts{
-		ProviderFunc: func() *schema.Provider {
-			return Provider()
-		},
-	})
+	opts := providerserver.ServeOpts{
+		Address:         "registry.terraform.io/snowplow-devops/snowplow",
+		ProtocolVersion: 5,
+	}
+	err := providerserver.Serve(context.Background(), NewProvider(version), opts)
+
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 }
