@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	gt "github.com/snowplow/snowplow-golang-tracker/v2/tracker"
 	"github.com/twinj/uuid"
 )
@@ -56,15 +57,10 @@ func stringToMap(str string) (map[string]interface{}, error) {
 }
 
 // contextsFromList converts a list of interfaces to context SDJs.
-func contextsFromList(vs []interface{}) ([]gt.SelfDescribingJson, error) {
+func contextsFromList(vs []types.Map) ([]gt.SelfDescribingJson, error) {
 	result := make([]gt.SelfDescribingJson, 0, len(vs))
 	for _, context := range vs {
-		attr, ok := context.(map[string]interface{})
-		if !ok {
-			continue
-		}
-
-		t, err := selfDescribingJSONFromMap(attr)
+		t, err := selfDescribingJSONFromMap(context)
 		if err != nil {
 			return nil, err
 		}
@@ -77,22 +73,34 @@ func contextsFromList(vs []interface{}) ([]gt.SelfDescribingJson, error) {
 }
 
 // selfDescribingJsonFromMap converts a map into a context SDJ.
-func selfDescribingJSONFromMap(attr map[string]interface{}) (*gt.SelfDescribingJson, error) {
-	if _, ok := attr["iglu_uri"]; !ok {
+func selfDescribingJSONFromMap(obj types.Map) (*gt.SelfDescribingJson, error) {
+	attr := obj.Elements()
+
+	var igluUri, payload string
+
+	if val, ok := attr["iglu_uri"]; !ok {
 		return nil, fmt.Errorf("Invalid context attributes: 'iglu_uri' key missing")
+	} else if igluUriVal, ok := val.(types.String); !ok {
+		return nil, fmt.Errorf("Invalid context attributes: 'iglu_uri' not string")
+	} else {
+		igluUri = igluUriVal.ValueString()
 	}
 
-	if _, ok := attr["payload"]; !ok {
+	if val, ok := attr["payload"]; !ok {
 		return nil, fmt.Errorf("Invalid context attributes: 'payload' key missing")
+	} else if payloadVal, ok := val.(types.String); !ok {
+		return nil, fmt.Errorf("Invalid context attributes: 'payload' not string")
+	} else {
+		payload = payloadVal.ValueString()
 	}
 
-	contextData, err := stringToMap(attr["payload"].(string))
+	contextData, err := stringToMap(payload)
 	if err != nil {
 		return nil, err
 	}
 
 	sdj := gt.InitSelfDescribingJson(
-		attr["iglu_uri"].(string),
+		igluUri,
 		contextData,
 	)
 

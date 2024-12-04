@@ -1,0 +1,17 @@
+---
+page_title: "{{ .Name }} {{ .Type }} - {{ .RenderedProviderName }}"
+subcategory: ""
+description: |-
+  {{ .Description }}
+---
+
+# {{ .Name }} {{ .Type }}
+
+{{ .Description }}
+
+## Example Usage
+
+{{tffile "../examples/resources/snowplow_track_self_describing_event/example_1.tf"}}
+
+
+{{ .SchemaMarkdown }}
