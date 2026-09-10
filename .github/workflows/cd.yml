@@ -9,7 +9,7 @@ jobs:
   goreleaser:
     strategy:
       matrix:
-        go-version: ['1.24']
+        go-version: ['1.26']
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:

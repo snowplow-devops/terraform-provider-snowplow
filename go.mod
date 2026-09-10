@@ -1,6 +1,6 @@
 module github.com/snowplow-devops/terraform-provider-snowplow
 
-go 1.24
+go 1.26
 
 require (
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.36.0
