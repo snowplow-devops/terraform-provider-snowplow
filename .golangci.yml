@@ -1,0 +1,16 @@
+version: "2"
+
+linters:
+  exclusions:
+    rules:
+      # The terraform-plugin-sdk v2 CRUD lifecycle hooks (Create/Read/Update/Delete/
+      # ConfigureFunc) are deprecated in favour of the *Context variants, but migrating
+      # this provider to them is a separate, larger piece of work - not a lint failure.
+      - path: terraform-provider-snowplow/provider\.go
+        linters:
+          - staticcheck
+        text: "SA1019"
+      - path: terraform-provider-snowplow/resource_track_self_describing_event\.go
+        linters:
+          - staticcheck
+        text: "SA1019"

@@ -37,7 +37,7 @@ func parseStatusCode(statusCode int) error {
 	case 2, 3:
 		err = nil
 	default:
-		err = fmt.Errorf("Got %d status code when sending event - need 2xx or 3xx", statusCode)
+		err = fmt.Errorf("got %d status code when sending event - need 2xx or 3xx", statusCode)
 	}
 
 	return err
@@ -79,11 +79,11 @@ func contextsFromList(vs []interface{}) ([]gt.SelfDescribingJson, error) {
 // selfDescribingJsonFromMap converts a map into a context SDJ.
 func selfDescribingJSONFromMap(attr map[string]interface{}) (*gt.SelfDescribingJson, error) {
 	if _, ok := attr["iglu_uri"]; !ok {
-		return nil, fmt.Errorf("Invalid context attributes: 'iglu_uri' key missing")
+		return nil, fmt.Errorf("invalid context attributes: 'iglu_uri' key missing")
 	}
 
 	if _, ok := attr["payload"]; !ok {
-		return nil, fmt.Errorf("Invalid context attributes: 'payload' key missing")
+		return nil, fmt.Errorf("invalid context attributes: 'payload' key missing")
 	}
 
 	contextData, err := stringToMap(attr["payload"].(string))

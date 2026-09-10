@@ -1,6 +1,6 @@
 # Snowplow Terraform Provider
 
-[![Actions Status][actions-image]][actions] [![Go Report Card][goreport-image]][goreport] [![Release][release-image]][releases] [![License][license-image]][license]
+[![Actions Status][actions-image]][actions] [![Release][release-image]][releases] [![License][license-image]][license]
 
 ## Overview
 
@@ -149,11 +149,8 @@ limitations under the License.
 [actions-image]: https://github.com/snowplow-devops/terraform-provider-snowplow/workflows/ci/badge.svg
 [actions]: https://github.com/snowplow-devops/terraform-provider-snowplow/actions
 
-[release-image]: http://img.shields.io/badge/release-0.7.5-6ad7e5.svg?style=flat
+[release-image]: http://img.shields.io/badge/release-0.7.6-6ad7e5.svg?style=flat
 [releases]: https://github.com/snowplow-devops/terraform-provider-snowplow/releases
 
 [license-image]: http://img.shields.io/badge/license-Apache--2-blue.svg?style=flat
 [license]: http://www.apache.org/licenses/LICENSE-2.0
-
-[goreport-image]: https://goreportcard.com/badge/github.com/snowplow-devops/terraform-provider-snowplow
-[goreport]: https://goreportcard.com/report/github.com/snowplow-devops/terraform-provider-snowplow
