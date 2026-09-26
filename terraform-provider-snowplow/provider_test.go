@@ -14,8 +14,10 @@
 package main
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestInitTracker(t *testing.T) {
@@ -100,4 +102,54 @@ func TestInitTracker_WithEmptyCollectorURI(t *testing.T) {
 	assert.Nil(tracker)
 	assert.NotNil(err)
 	assert.Equal("URI of the Snowplow Collector is empty - this can be set either at the provider or resource level with the 'collector_uri' input", err.Error())
+}
+
+func TestProvider(t *testing.T) {
+	assert := assert.New(t)
+
+	p := Provider()
+	assert.Nil(p.InternalValidate())
+	assert.Contains(p.ResourcesMap, "snowplow_track_self_describing_event")
+	assert.Empty(p.DataSourcesMap)
+}
+
+func TestProviderConfigure_Defaults(t *testing.T) {
+	assert := assert.New(t)
+
+	d := schema.TestResourceDataRaw(t, Provider().Schema, map[string]interface{}{})
+
+	ctx, err := providerConfigure(d)
+	assert.Nil(err)
+	assert.Equal(&Context{
+		CollectorURI:       "",
+		TrackerAppID:       "",
+		TrackerNamespace:   "",
+		TrackerPlatform:    "srv",
+		EmitterRequestType: "POST",
+		EmitterProtocol:    "HTTPS",
+	}, ctx)
+}
+
+func TestProviderConfigure_WithValues(t *testing.T) {
+	assert := assert.New(t)
+
+	d := schema.TestResourceDataRaw(t, Provider().Schema, map[string]interface{}{
+		"collector_uri":        "com.acme",
+		"tracker_app_id":       "app-id",
+		"tracker_namespace":    "namespace",
+		"tracker_platform":     "web",
+		"emitter_request_type": "GET",
+		"emitter_protocol":     "HTTP",
+	})
+
+	ctx, err := providerConfigure(d)
+	assert.Nil(err)
+	assert.Equal(&Context{
+		CollectorURI:       "com.acme",
+		TrackerAppID:       "app-id",
+		TrackerNamespace:   "namespace",
+		TrackerPlatform:    "web",
+		EmitterRequestType: "GET",
+		EmitterProtocol:    "HTTP",
+	}, ctx)
 }

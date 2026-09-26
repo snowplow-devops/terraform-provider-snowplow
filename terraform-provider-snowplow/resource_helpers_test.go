@@ -93,3 +93,51 @@ func TestContextsFromList_NoPayload(t *testing.T) {
 	assert.NotNil(err)
 	assert.Nil(contextSdeList)
 }
+
+func TestContextsFromList_SkipsNonMaps(t *testing.T) {
+	assert := assert.New(t)
+
+	contextList := []interface{}{
+		nil,
+		"not-a-map",
+		map[string]interface{}{"iglu_uri": "iglu:com.acme/context_1/jsonschema/1-0-0", "payload": "{\"foo\":\"bar\"}"},
+	}
+
+	contextSdeList, err := contextsFromList(contextList)
+	assert.Nil(err)
+	assert.Equal(1, len(contextSdeList))
+}
+
+func TestContextsFromList_Empty(t *testing.T) {
+	assert := assert.New(t)
+
+	contextSdeList, err := contextsFromList([]interface{}{})
+	assert.Nil(err)
+	assert.NotNil(contextSdeList)
+	assert.Equal(0, len(contextSdeList))
+}
+
+func TestSelfDescribingJSONFromMap_Valid(t *testing.T) {
+	assert := assert.New(t)
+
+	sdj, err := selfDescribingJSONFromMap(map[string]interface{}{"iglu_uri": "iglu:com.acme/event/jsonschema/1-0-0", "payload": "{\"foo\":\"bar\"}"})
+	assert.Nil(err)
+	assert.NotNil(sdj)
+	assert.Equal("{\"data\":{\"foo\":\"bar\"},\"schema\":\"iglu:com.acme/event/jsonschema/1-0-0\"}", sdj.String())
+}
+
+func TestSelfDescribingJSONFromMap_InvalidPayload(t *testing.T) {
+	assert := assert.New(t)
+
+	sdj, err := selfDescribingJSONFromMap(map[string]interface{}{"iglu_uri": "iglu:com.acme/event/jsonschema/1-0-0", "payload": "{\"foo\"}"})
+	assert.NotNil(err)
+	assert.Nil(sdj)
+}
+
+func TestGetUUID(t *testing.T) {
+	assert := assert.New(t)
+
+	id := getUUID()
+	assert.Regexp("^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$", id)
+	assert.NotEqual(id, getUUID())
+}
