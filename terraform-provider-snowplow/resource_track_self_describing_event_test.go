@@ -17,6 +17,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"sync"
 	"testing"
@@ -25,12 +26,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// mockCollector is a fake Snowplow Collector which records the bodies
-// of the requests it receives and responds with a fixed status code.
+// mockCollector is a fake Snowplow Collector which records the requests
+// it receives and responds with a fixed status code.
 type mockCollector struct {
-	server *httptest.Server
-	mu     sync.Mutex
-	bodies []string
+	server   *httptest.Server
+	mu       sync.Mutex
+	requests []mockRequest
+}
+
+type mockRequest struct {
+	method string
+	query  url.Values
+	body   string
 }
 
 func newMockCollector(t *testing.T, statusCode int) *mockCollector {
@@ -38,7 +45,7 @@ func newMockCollector(t *testing.T, statusCode int) *mockCollector {
 	c.server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, _ := io.ReadAll(r.Body)
 		c.mu.Lock()
-		c.bodies = append(c.bodies, string(body))
+		c.requests = append(c.requests, mockRequest{method: r.Method, query: r.URL.Query(), body: string(body)})
 		c.mu.Unlock()
 		w.WriteHeader(statusCode)
 	}))
@@ -55,13 +62,13 @@ func (c *mockCollector) host() string {
 func (c *mockCollector) requestCount() int {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	return len(c.bodies)
+	return len(c.requests)
 }
 
-func (c *mockCollector) lastBody() string {
+func (c *mockCollector) lastRequest() mockRequest {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	return c.bodies[len(c.bodies)-1]
+	return c.requests[len(c.requests)-1]
 }
 
 func providerContext(collectorURI string) *Context {
@@ -125,9 +132,11 @@ func TestResourceTrackSelfDescribingEvent_Create(t *testing.T) {
 	assert.Nil(err)
 	assert.Len(d.Id(), 36)
 	assert.Equal(1, collector.requestCount())
-	assert.Contains(collector.lastBody(), "\"aid\":\"app-id\"")
-	assert.Contains(collector.lastBody(), "\"tna\":\"namespace\"")
-	assert.Contains(collector.lastBody(), "\"p\":\"srv\"")
+	req := collector.lastRequest()
+	assert.Equal(http.MethodPost, req.method)
+	assert.Contains(req.body, "\"aid\":\"app-id\"")
+	assert.Contains(req.body, "\"tna\":\"namespace\"")
+	assert.Contains(req.body, "\"p\":\"srv\"")
 }
 
 func TestResourceTrackSelfDescribingEvent_Update(t *testing.T) {
@@ -181,6 +190,13 @@ func TestResourceTrackSelfDescribingEvent_ResourceOverridesProvider(t *testing.T
 	err := resourceTrackSelfDescribingEventCreate(d, providerContext("127.0.0.1:1"))
 	assert.Nil(err)
 	assert.Equal(1, collector.requestCount())
+
+	// Overridden values come from the resource, the rest from the provider
+	req := collector.lastRequest()
+	assert.Equal(http.MethodGet, req.method)
+	assert.Equal("resource-app-id", req.query.Get("aid"))
+	assert.Equal("namespace", req.query.Get("tna"))
+	assert.Equal("srv", req.query.Get("p"))
 }
 
 func TestResourceTrackSelfDescribingEvent_CollectorError(t *testing.T) {
