@@ -1,3 +1,14 @@
+Version 0.7.8 (2026-11-21)
+--------------------------
+Bump golang.org/x/net to v0.62.0 to resolve CVEs (#53)
+  - CVE-2026-78663 (Critical): HTTP/2 connection-level flow control double refund
+  - CVE-2026-97032 (High): HTTP/2 HPACK encoder concurrent modification crash
+  - CVE-2026-78669 (High): HTTP/2 SETTINGS_INITIAL_WINDOW_SIZE CPU exhaustion
+  - CVE-2026-78661 (High): x/net/html quadratic text node coalescing
+  - CVE-2026-78660 (High): HTTP/2 malformed framing headers response smuggling
+  - CVE-2026-78659 (High): HTTP/2 Trailer header memory exhaustion
+  - CVE-2026-97045 (Medium): x/net/html foreign namespace re-parse
+
 Version 0.7.7 (2026-09-26)
 --------------------------
 Move Github Actions to use hashes instead of versions (#50)
